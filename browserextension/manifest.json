@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "no-phishing-here",
-  "description": "ETHBrno phishing prevention project - whitelistning trusted projects domains",
+  "name": "No Phishing Here",
+  "description": "ETHBrno phishing prevention extension based on whitelistning",
   "version": "1.0",
   "homepage_url": "https://github.com/SantiagoDePolonia/no-phishing-here-mvp",
   "content_scripts": [

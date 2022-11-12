@@ -4,6 +4,7 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <link rel="icon" type="image/png" href="./favicon.png">
   <title>No Phishing here</title>
   <style>
     /* -------------------------------------
@@ -11,7 +12,9 @@
       ------------------------------------- */
 
     /*All the styling goes here*/
-
+    .scam-page {
+      text-transform: lowercase;
+    }
     img {
       border: none;
       -ms-interpolation-mode: bicubic;
@@ -376,17 +379,16 @@
                   <tr>
                     <td>
                       <p>Hi there,</p>
-                      <p>This page was blocked because this: domain, social media profile or IP address had been
-                        reported as phishing related.</p>
+                      <p>The page <strong class='scam-page'></strong> is blacked because it has been recognized as scam.</p>
                       <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                         <tbody>
                           <tr>
                             <td>
-                              <center> <span href="http://htmlemail.io" target="_blank">
+                              <center> <a href="#" onclick="onClickProceed(event);">
                                   <u style="cursor:pointer">
-                                    Proceed anyway
+                                    Proceed anyway to: <strong class='scam-page'></strong>
                                   </u>
-                                </span> </center>
+                                </a> </center>
                             </td>
                             <td align="left">
                               <table role="presentation" border="0" cellpadding="0" cellspacing="0">
@@ -422,6 +424,29 @@
       <td>&nbsp;</td>
     </tr>
   </table>
+
+  <script>
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+      get: (searchParams, prop) => searchParams.get(prop),
+    });
+    
+    const from = params.from || document.referrer;
+
+    function onClickProceed(e) {
+      e = e || window.event;
+      e.preventDefault();
+
+      window.location.href = from;
+    }
+
+    window.addEventListener('load', () => {
+      const collection = document.getElementsByClassName("scam-page");
+      for(let i=0; collection.length > i; i++) {
+        const element = collection[i];
+        element.textContent = from;
+      }
+    });
+  </script>
 </body>
 
 </html>
