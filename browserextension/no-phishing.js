@@ -25,16 +25,20 @@ const findWhitelistedProjectBasedOnCurrentDomainAndTitle = () => (
 )
 
 const analyzePage = () => {
-
+  console.log("Page analyze started!");
   // handle content modifications
-  if (window.location.href.indexOf('https://twitter.com') !== -1) {
-    isTwitterAccountPhishing();
+  if (window.location.hostname.indexOf('twitter.com') === 0) {
+    if(isTwitterAccountPhishing()) {
+      throwWarning();
+    }
   } else {
     domainAnalyzer();
   }
 };
 
 const isTwitterAccountPhishing = () => {
+  console.log("Twitter analyze started!");
+
   const twitterAccount = document.title.slice(document.title.indexOf(" (@")+3, document.title.indexOf(") /"));
   if(isTwitterAccountWhitelisted(twitterAccount)) {
     console.log("Twitter account whitelisted!");
@@ -48,7 +52,7 @@ const isTwitterAccountPhishing = () => {
     twitterTitle.indexOf(item.name) !== -1
   );
 
-  if(!project) {
+  if(!!project) {
     console.log("Twitter fake account detected!")
     return true;
   }
@@ -65,7 +69,7 @@ const isItDomainOrSubdomainOfWhitelistedProject = (project) => (
 );
 
 const domainAnalyzer = () => {
-
+  console.log("Domain analyzer started!");
   // Step 0: Find whitelisted related project
   const project = findWhitelistedProjectBasedOnCurrentDomainAndTitle();
 
@@ -87,7 +91,7 @@ const domainAnalyzer = () => {
     }).then(response => response.json())
     .then(responseJson => {
       if(responseJson.output.distance <= 5) {
-        throwAlert();
+        throwWarning();
       } else {
         console.log("It's probably not a phishing.")
       };
@@ -95,12 +99,12 @@ const domainAnalyzer = () => {
   }
 }
 
-function throwAlert() {
+function throwWarning() {
   alert('It\'s phishing!');
 }
 
 // TODO:
 // - does the url contains no ASCII characters
 
-window.addEventListener("load", analyzePage);
+setTimeout(analyzePage, 2000);
 console.log("Content Script loaded");
