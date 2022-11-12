@@ -24,11 +24,12 @@
  * 
  * 2. Not a twitter:
  *  - check the domain favicon with deepai
- * 
+ *  If the icon is very similar, and the domain is not this one whitelisted it's a fake website.
  */
 
 // TODO:
 // - does the url contains no ASCII characters
+// - integrate with the database at ArWeave
 
 const WHITELIST = [
   {
