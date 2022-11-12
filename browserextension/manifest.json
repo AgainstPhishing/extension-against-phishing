@@ -4,7 +4,6 @@
   "description": "ETHBrno phishing prevention project - whitelistning trusted projects domains",
   "version": "1.0",
   "homepage_url": "https://github.com/SantiagoDePolonia/no-phishing-here-mvp",
-  "web_accessible_resources": ["/pages/blockpage.html"],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
