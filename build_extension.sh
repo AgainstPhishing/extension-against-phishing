@@ -1,4 +1,5 @@
 #!/bin/bash
 cd browserextension
-[ -e ../no-phishing-here.xpi ] && rm ../no-phishing-here.xpi
-zip -r ../no-phishing-here.xpi ./*
+
+[ -e ../extension-against-phishing-build.xpi ] && rm ../extension-against-phishing-build.xpi
+zip -r ../extension-against-phishing-build.xpi ./*
