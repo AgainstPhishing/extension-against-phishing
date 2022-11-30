@@ -1,16 +1,28 @@
 {
-  "manifest_version": 2,
-  "name": "No Phishing Here",
-  "description": "ETHBrno phishing prevention extension based on whitelistning",
+  "manifest_version": 3,
+  "name": "Extension Against Phishing",
+  "description": "Against Phishing browser extension prevents you against phishing based on blacklisted and whitelisted crypto related resources.",
   "version": "1.0",
-  "homepage_url": "https://github.com/SantiagoDePolonia/no-phishing-here-mvp",
+  "homepage_url": "https://github.com/AgainstPhishing/extension-against-phishing",
+  "permissions": ["background", "storage", "declarativeNetRequest"],
+  "host_permissions": [
+    "*://*/*"
+  ],
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["against-whitelist.js"]
+      "matches": ["*://*/*"],
+      "js": ["against-blacklist.js"]
     }
   ],
-  "browser_action": {
+  "web_accessible_resources": [{
+    "matches": ["*://*/*"],
+    "resources": ["lib/psl.min.js"]
+  }],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
     "default_icon": {
       "16": "icons/logo-16.png",
       "32": "icons/logo-32.png"
