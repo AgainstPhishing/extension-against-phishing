@@ -1,9 +1,10 @@
 ### TO DO:
 
-- downloading domains blacklist from github by background service worker
-- downloading whitelist from github by bakcground service worker
++ downloading domains blacklist from github by background service worker
+- parse window.location.hostname and obtain domain
 - add checking against blacklist AND
   - block pages which are present on blacklist
+- downloading whitelist from github by bakcground service worker
 
 - use local script in page blocking
 
