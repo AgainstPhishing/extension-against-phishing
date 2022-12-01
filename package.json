@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "start:firefox": "cp ./src/manifests/firefox/manifest.json ./src/manifest.json && web-ext run --browser-console --firefox-preview -t firefox-desktop -s ./src/",
+    "start:chromium": "cp ./src/manifests/chromium/manifest.json ./src/manifest.json && web-ext run --browser-console --firefox-preview -t firefox-desktop -s ./src/",
+    "lint": "cp ./src/manifests/firefox/manifest.json ./src/manifest.json && web-ext lint --source-dir ./src/",
+    "build": "bash build_extension.sh"
+  },
+  "devDependencies": {
+    "web-ext": "^7.4.0"
+  }
+}

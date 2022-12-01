@@ -15,17 +15,12 @@
     }
   ],
   "background": {
-    "scripts": ["background.js"]
+    "service_worker": "background.js"
   },
   "action": {
     "default_icon": {
       "16": "icons/logo-16.png",
       "32": "icons/logo-32.png"
     }
-  },
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "{3a372b4e-4a30-413c-8eed-f786ebde37f1}"
-    }
-  }  
+  }
 }
