@@ -1,8 +1,7 @@
 'use strict';
 
 function blockWebsite() {
-
-  //window.location.href = 'https://phishing-blocked.surge.sh/?from=' + window.location.href;
+  window.location.href = 'https://phishing-blocked.surge.sh/?from=' + window.location.href;
 }
 
 const doesUserVisitBlacklistedDomain = (blacklistDomains) => {

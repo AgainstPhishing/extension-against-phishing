@@ -246,7 +246,6 @@ function initCheckingAgainstWhitelist() {
         runOnObservedMutation(analyzeTwitter);
         analyzeTwitter();
       });
-      
     } else {
       chrome.storage.local.get('whitelistDomains', ({whitelistDomains}) => {
         whitelistDomainsGlobal = whitelistDomains;

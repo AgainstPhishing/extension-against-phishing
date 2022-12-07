@@ -66,7 +66,7 @@ const onBlacklistDomainsUpdate = () => {
       )
     });
   } else {
-    console.error("There is no chrome.webRequest OR chrome.webRequest.onBeforeRequest!");
+    console.error("AP: There is no chrome.webRequest OR chrome.webRequest.onBeforeRequest!");
   }
 };
 
@@ -172,5 +172,5 @@ function generateCheckAgainstBlacklist(blacklistDomains) {
 if(chrome.storage.onChanged) {
   chrome.storage.onChanged.addListener(onBlacklistDomainsUpdate);
 } else {
-  console.error("chrome.storage.onChanged doesn't exist")
+  console.error("AP: chrome.storage.onChanged doesn't exist");
 }
