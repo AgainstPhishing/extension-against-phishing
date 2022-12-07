@@ -7,6 +7,8 @@
   + updates - 5 minutes - firefox
   - background.js - webRequestBlocking - firefox
 
+- Create "Page blocked" page for browser extension more accurate than https://phishing-blocked.surge.sh/
+
 - downloading whitelist from github by bakcground service worker
 
 - improve checking against whitelist, but taka the list from whitelist repository
