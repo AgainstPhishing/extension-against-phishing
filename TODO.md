@@ -1,11 +1,15 @@
 ### TO DO:
 
-+ downloading domains blacklist from github by background service worker
-- parse window.location.hostname and obtain domain
-- add checking against blacklist AND
-  - block pages which are present on blacklist
+- checking against blacklist:
+  - content-script - chrome
+  - content-script - firefox
+  - updates - 5 minutes - chrome
+  - updates - 5 minutes - firefox
+  - background.js - webRequestBlocking - firefox
+
 - downloading whitelist from github by bakcground service worker
 
-- use local script in page blocking
-
 - improve checking against whitelist, but taka the list from whitelist repository
+
+- design tests
+- implement tests

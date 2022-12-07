@@ -2,14 +2,21 @@ function throwWarning() {
   window.location.href = 'https://phishing-blocked.surge.sh/?from=' + window.location.href;
 }
 
-const isUserVisitBlacklistedDomain = (blacklistDomains) => {
+const doesUserVisitBlacklistedDomain = (blacklistDomains) => {
   const domain = psl.parse(window.location.hostname).domain;
-  console.log("isUserVisitBlacklistedDomain", domain, blacklistDomains);
-  return -1 !== blacklistDomains.findIndex(blacklistDomain => blacklistDomain === domain);
+  const {hostname} = window.location;
+
+  console.info(`AP: isUserVisitBlacklistedDomain, blacklistDomains (${blacklistDomains.length}), hostname: ${hostname}, domain: ${domain}`);
+  return -1 !== 
+    blacklistDomains.findIndex(blacklistDomain => 
+      blacklistDomain === domain ||
+      blacklistDomain === hostname ||
+      hostname.endsWith("."+blacklistDomain)
+    );
 };
 
 chrome.storage.local.get('blacklistDomains', ({blacklistDomains}) => {
-  if(isUserVisitBlacklistedDomain(blacklistDomains)) {
+  if(doesUserVisitBlacklistedDomain(blacklistDomains)) {
     throwWarning();
   }
 });
