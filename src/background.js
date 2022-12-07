@@ -25,7 +25,7 @@ const WHITELIST_DOMAINS_GITHUB_LOCATION = {
 const WHITELIST_TWITTER_GITHUB_LOCATION = {
   repository: "AgainstPhishing/whitelist",
   branch: "main",
-  path: "data/domains.json"
+  path: "data/profiles_twitter.json"
 }
 
 const DATA_URLS = [

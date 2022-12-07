@@ -48,12 +48,12 @@ function getCurrentFaviconURL() {
     return window.location.origin + "/" + favicon;        
 }
 
-const findWhitelistedProjectByTwitterName = (twitterPageName) => (
-  whitelistTwitterGlobal.find(
-    item => twitterPageName.toLowerCase().indexOf(item.name.toLowerCase()) !== -1 ||
+const findWhitelistedProjectByTwitterName = (twitterPageName) => whitelistTwitterGlobal.find(
+  item => (
+    twitterPageName.toLowerCase().indexOf(item.name.toLowerCase()) !== -1 ||
     twitterPageName.toLowerCase().indexOf(item.projectName.toLowerCase()) !== -1
   )
-)
+);
 
 const findWhitelistedProjectByPageTitle = () => (
   whitelistDomainsGlobal.find(
@@ -242,7 +242,7 @@ function initCheckingAgainstWhitelist() {
     if(isTwitterPage()) {
       chrome.storage.local.get('whitelistTwitter', ({whitelistTwitter}) => {
         whitelistTwitterGlobal = whitelistTwitter;
-  
+
         runOnObservedMutation(analyzeTwitter);
         analyzeTwitter();
       });
