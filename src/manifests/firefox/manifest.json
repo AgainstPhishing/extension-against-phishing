@@ -5,14 +5,20 @@
   "version": "1.0",
   "homepage_url": "https://github.com/AgainstPhishing/extension-against-phishing",
   "permissions": [
-    "storage", "unlimitedStorage", "webRequest", "webRequestBlocking",
-    "alarms", "activeTab", "tabs", "<all_urls>"
+    "storage", "unlimitedStorage",
+    "webRequest", "webRequestBlocking",
+    "activeTab", "tabs",
+    "alarms", "<all_urls>"
   ],
   "content_scripts": [
     {
       "run_at": "document_start",
       "matches": ["<all_urls>"],
-      "js": ["lib/psl.min.js", "against-blacklist.js"]
+      "js": [
+        "lib/psl.min.js",
+        "against-blacklist.js",
+        "against-whitelist.js"
+      ]
     }
   ],
   "background": {
