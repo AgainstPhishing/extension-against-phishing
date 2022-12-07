@@ -1,12 +1,12 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "Extension Against Phishing",
   "description": "Against Phishing browser extension prevents you against phishing based on blacklisted and whitelisted crypto related resources.",
   "version": "1.0",
   "homepage_url": "https://github.com/AgainstPhishing/extension-against-phishing",
-  "permissions": ["storage", "unlimitedStorage", "webRequest", "webRequestBlocking", "alarms"],
-  "host_permissions": [
-    "<all_urls>"
+  "permissions": [
+    "storage", "unlimitedStorage", "webRequest", "webRequestBlocking",
+    "alarms", "activeTab", "tabs", "<all_urls>"
   ],
   "content_scripts": [
     {
@@ -18,7 +18,7 @@
   "background": {
     "scripts": ["background.js"]
   },
-  "action": {
+  "browser_action": {
     "default_icon": {
       "16": "icons/logo-16.png",
       "32": "icons/logo-32.png"

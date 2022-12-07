@@ -20,11 +20,16 @@ const BLACKLIST_DOMAINS_URL = RANDOM_URL ?
 
 
 function updateStorageWithBlacklistDomains() {
-  fetch(BLACKLIST_DOMAINS_URL, {cache: "no-cache"}).then(response => response.json()).then(responseJson => {
-    chrome.storage.local.set({blacklistDomains: responseJson.data}).then(() => {
-      onBlacklistDomainsUpdate();
+  fetch(BLACKLIST_DOMAINS_URL, {cache: "no-cache"})
+    .then(response => response.json())
+    .then(responseJson => {
+      console.info(`AP: updateStorageWithBlacklistDomains, blacklistDomains.length = ${responseJson.data?.length}` );
+      chrome.storage.local.set({blacklistDomains: responseJson.data}).then(() => {
+        onBlacklistDomainsUpdate();
+      });
+    }).catch(error => {
+      console.error('AP updateStorageWithBlacklistDomains fetch rrror:', error);
     });
-  });
 }
 
 chrome.runtime.onInstalled.addListener(updateStorageWithBlacklistDomains);
@@ -32,7 +37,7 @@ chrome.runtime.onInstalled.addListener(updateStorageWithBlacklistDomains);
 chrome.alarms.create({ delayInMinutes: 1 });
 
 chrome.alarms.onAlarm.addListener(() => {
-  console.info("AP: Alarm ");
+  console.info("AP: Alarm");
   updateStorageWithBlacklistDomains();
   chrome.alarms.create({ delayInMinutes: 1 });
 });
