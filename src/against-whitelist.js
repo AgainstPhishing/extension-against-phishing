@@ -202,6 +202,8 @@ const domainAnalyzer = () => {
     return;
   }
 
+  console.log("AP: whitelist faviconUrl", project.faviconUrl);
+
   // Analyze favicon size. If the same bytes it's a probably scam.
   // TODO: Get one favicon. The bigger one.
   fetch(project.faviconUrl).then(getResponseHeaderContentLength).then(projectFaviconSize => {
