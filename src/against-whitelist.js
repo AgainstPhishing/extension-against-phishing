@@ -1,5 +1,8 @@
 'use strict';
 
+const resemble = require("./lib/resemble");
+
+const IMAGE_SIMILARITY_THRESHOLD = 5;
 /**
  * There are two flows:
  * ## For Twitter website
@@ -217,7 +220,17 @@ const domainAnalyzer = () => {
         return;
       }
 
-      // TODO: Analyze favicon by content with resamble.js;
+      // Resemble.js comparison
+      resemble(project.faviconUrl)
+        .compareTo(currentFaviconURL)
+        .scaleToSameSize()
+        .ignoreColors()
+        .onComplete(data => {
+          console.info("AP: resemble, onComplete", data);
+          if(data.rawMisMatchPercentage < IMAGE_SIMILARITY_THRESHOLD) {
+            blockWebsite('whitelist_favicon_similar_'+IMAGE_SIMILARITY_THRESHOLD);
+          }
+        });
     })
   });
 }

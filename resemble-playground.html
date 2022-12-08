@@ -1,0 +1,20 @@
+<html>
+  <head>
+    <title>Playground Resemble.js</title>
+  </head>
+<body>
+  <script src="./src/lib/resemble.js"></script>
+  <script>
+    resemble('https://claim.ens.domains/favicon-32x32.png')
+      .compareTo('https://claim.ens.domains/favicon.ico')
+      .scaleToSameSize()
+      .ignoreColors()
+      .onComplete(data => {
+        console.log("DATA: ", data);
+        if(data.rawMisMatchPercentage < 5) {
+          console.log("Images the same!");
+        }
+      });
+  </script>
+</body>
+</html>
