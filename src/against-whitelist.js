@@ -1,8 +1,7 @@
 'use strict';
 
-const resemble = require("./lib/resemble");
+const IMAGE_SIMILARITY_THRESHOLD = 10;
 
-const IMAGE_SIMILARITY_THRESHOLD = 5;
 /**
  * There are two flows:
  * ## For Twitter website
@@ -42,7 +41,7 @@ function isTwitterPage() {
 }
 
 function getCurrentFaviconURL() {
-    var favicon = 'favicon.ico';
+    var favicon = 'favicon.ico'; // default favicon url
     var nodeList = document.getElementsByTagName("link");
     for (var i = 0; i < nodeList.length; i++)
     {
@@ -224,7 +223,6 @@ const domainAnalyzer = () => {
       resemble(project.faviconUrl)
         .compareTo(currentFaviconURL)
         .scaleToSameSize()
-        .ignoreColors()
         .onComplete(data => {
           console.info("AP: resemble, onComplete", data);
           if(data.rawMisMatchPercentage < IMAGE_SIMILARITY_THRESHOLD) {
