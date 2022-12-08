@@ -1,7 +1,7 @@
 'use strict';
 
-function blockWebsite() {
-  window.location.href = 'https://phishing-blocked.surge.sh/?from=' + window.location.href;
+function blockWebsite(type = 'other') {
+  window.location.href = `https://phishing-blocked.surge.sh/?from=${window.location.href}&type=${type}`;
 }
 
 const doesUserVisitBlacklistedDomain = (blacklistDomains) => {
@@ -19,6 +19,6 @@ const doesUserVisitBlacklistedDomain = (blacklistDomains) => {
 
 chrome.storage.local.get('blacklistDomains', ({blacklistDomains}) => {
   if(doesUserVisitBlacklistedDomain(blacklistDomains)) {
-    blockWebsite();
+    blockWebsite('blacklist_domain_content_script');
   }
 });

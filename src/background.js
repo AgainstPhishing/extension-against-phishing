@@ -54,12 +54,12 @@ const onBlacklistDomainsUpdate = () => {
   
   // webRequest would work only in Firefox OR
   //    on Chromium engine with manifest version 2
-  if(chrome.webRequest && chrome.webRequest.onBeforeRequest) {
+  if(browser.webRequest && browser.webRequest.onBeforeRequest) {
     // TODO: remove existing listener
 
     chrome.storage.local.get('blacklistDomains', ({blacklistDomains}) => {
       const checkAgainstBlacklistListener = generateCheckAgainstBlacklist(blacklistDomains);
-      chrome.webRequest.onBeforeRequest.addListener(
+      browser.webRequest.onBeforeRequest.addListener(
         checkAgainstBlacklistListener,
         {urls: ["<all_urls>"]},
         ["blocking", "main_frame"]
@@ -80,7 +80,7 @@ function getDataResourceURL(url_template, location) {
 function fetchDataAndUpdateStorage(url, storageKey, callbackFunc = () => {}) {
   console.info("AP: fetchDataAndUpdateStorage, URL, storageKey: ", url);
 
-  fetch(url, {cache: "no-cache"})
+  fetch(url)
     .then(response => response.json())
     .then(responseJson => {
       console.info(`AP: fetchDataAndUpdateStorage, ${storageKey}.length = ${responseJson.data?.length}` );
@@ -133,18 +133,6 @@ chrome.alarms.onAlarm.addListener(({name}) => {
 //    which is not available at manifest v3 on Chrome AND
 //    is risky because it's hard to get blacklistDomains inside of blocking callback
 
-// function checkAgainstBlacklist() {
-//   chrome.storage.local.get('blacklistDomains', ({blacklistDomains}) => {
-//     if(simpleCheckAgainstBlacklistedDomains(blacklistDomains)) {
-//       return {
-//         redirectUrl: "http://phishing-blocked.surge.sh/"
-//       };
-//     }
-
-//     return {cancel: true};
-//   });
-// }
-
 function _doesHostnameBlacklisted(blacklistDomains, hostname) {
   extractDomain
   for(let i = 0; i < blacklistDomains.length; i++) {
@@ -156,12 +144,12 @@ function _doesHostnameBlacklisted(blacklistDomains, hostname) {
 }
 
 function generateCheckAgainstBlacklist(blacklistDomains) {
-  return function checkAgainstBlacklistListener({url}) {
+  return function _checkAgainstBlacklistListener({url}) {
     const {hostname} = new URL(url);
     console.info("AP: _doesHostnameBlacklisted(blacklistDomains, hostname)", _doesHostnameBlacklisted(blacklistDomains, hostname), hostname, blacklistDomains);
     if(_doesHostnameBlacklisted(blacklistDomains, hostname)) {
       return {
-        redirectUrl: "http://phishing-blocked.surge.sh/"
+        redirectUrl: `https://phishing-blocked.surge.sh/?from=${url}&type=blacklist_webRequestBlocking`
       };
     }
 
@@ -169,8 +157,4 @@ function generateCheckAgainstBlacklist(blacklistDomains) {
   };
 }
 
-if(chrome.storage.onChanged) {
-  chrome.storage.onChanged.addListener(onBlacklistDomainsUpdate);
-} else {
-  console.error("AP: chrome.storage.onChanged doesn't exist");
-}
+chrome.storage.onChanged.addListener(onBlacklistDomainsUpdate);

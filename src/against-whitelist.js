@@ -30,6 +30,10 @@ var previousLocationHref = document.location.href;
 var whitelistTwitterGlobal = [];
 var whitelistDomainsGlobal = [];
 
+function blockWebsite(type = 'other') {
+  window.location.href = `https://phishing-blocked.surge.sh/?from=${window.location.href}&type=${type}`;
+}
+
 function isTwitterPage() {
   return window.location.hostname.startsWith('twitter.com');
 }
@@ -65,7 +69,7 @@ const findWhitelistedProjectByPageTitle = () => (
 const analyzeTwitter = () => {
   console.info("AP: Twitter analyze started!");
   if(isTwitterAccountPhishing()) {
-    blockWebsite();
+    blockWebsite('whitelist_twitter');
   }
 };
 
@@ -157,20 +161,29 @@ const isTwitterAccountWhitelisted = (twitterAccount) => {
   return !!whitelistTwitterGlobal.find(item => item.handle === twitterAccount);
 }
 
-const isItDomainOrSubdomainOfWhitelistedProject = (project) => (
-  project.domain === window.location.hostname || window.location.hostname.split("").reverse().join("").indexOf(project.domain.split("").reverse().join("")+".") === 0
-);
+const isItDomainOrSubdomainOfWhitelistedProject = ({address}) => {
+  const domain = psl.parse(window.location.hostname).domain;
+  const {hostname} = window.location;
 
-function getResponseHeaderContentLength(response) {
-  const headerContentLength = response.headers.get('Content-Length');
-  const contentLength = parseInt(headerContentLength, 10);
+  return (
+    address === hostname ||
+    address === domain ||
+    hostname.endsWith("."+address)
+  );
+};
 
-  if(!headerContentLength || !contentLength) {
-    console.error("AP: favicon analyse - headerContentLength OR contentLength is empty!", headerContentLength, contentLength);
-    throw new Error("AP: favicon analyse - headerContentLength OR contentLength is empty!");
+async function getResponseHeaderContentLength(response) {
+  const blob = await response.blob();
+  const {size} = blob;
+  
+  console.info("AP: favicon size", size);
+
+  if(!size) {
+    console.error("AP: favicon analyse - size is empty!");
+    throw new Error("AP: favicon analyse - size is empty!");
   }
 
-  return contentLength;
+  return size;
 }
 
 const domainAnalyzer = () => {
@@ -190,24 +203,21 @@ const domainAnalyzer = () => {
   }
 
   // Analyze favicon size. If the same bytes it's a probably scam.
-  fetch(project.faviconUrl).then(getResponseHeaderContentLength).then(projectFaviconContentLength => {
+  // TODO: Get one favicon. The bigger one.
+  fetch(project.faviconUrl).then(getResponseHeaderContentLength).then(projectFaviconSize => {
     const currentFaviconURL = getCurrentFaviconURL();
     console.info("AP: currentFaviconURL", currentFaviconURL);
   
-    fetch(currentFaviconURL).then(getResponseHeaderContentLength).then(currentFaviconContentLength => {
-      if(projectFaviconContentLength === currentFaviconContentLength) {
+    fetch(currentFaviconURL).then(getResponseHeaderContentLength).then(currentFaviconSize => {
+      if(projectFaviconSize === currentFaviconSize) {
         console.info("AP: Favicons have the same size!");
-        blockWebsite();
+        blockWebsite('whitelist_favicon_size');
         return;
       }
 
       // TODO: Analyze favicon by content with resamble.js;
     })
   });
-}
-
-function blockWebsite() {
-  window.location.href = 'https://phishing-blocked.surge.sh/?from=' + window.location.href;
 }
 
 function runOnObservedMutation(callbackFunction) {
