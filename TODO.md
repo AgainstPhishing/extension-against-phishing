@@ -7,6 +7,8 @@
   + check comparing favicons sizes
   - resemble.js - implementation
 
+- from GET parameter should be encoded by base64 or URL encoded.
+  - Example: https://phishing-blocked.surge.sh/?from=http://cens.domains/airdrop/&type=whitelist_favicon_size
 
 - Whitelist, twitter profiles:
   - make it working for search results

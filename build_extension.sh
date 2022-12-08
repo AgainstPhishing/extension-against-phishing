@@ -22,10 +22,10 @@ cd ../../
 echo "Firefox build finished!";
 
 # build Chrome
-[ -e ../extension-against-phishing-build-chrome.xpi ] && rm ../extension-against-phishing-build-chrome.xpi
-zip -r ../extension-against-phishing-build-chrome.xpi ./* -x manifests/\* manifest.json
+[ -e ../extension-against-phishing-build-chrome.zip ] && rm ../extension-against-phishing-build-chrome.zip
+zip -r ../extension-against-phishing-build-chrome.zip ./* -x manifests/\* manifest.json
 cd manifests/chromium
-zip ../../../extension-against-phishing-build-chrome.xpi manifest.json
+zip ../../../extension-against-phishing-build-chrome.zip manifest.json
 cd ../../
 
 cp manifests/chromium/manifest.json manifest.json
