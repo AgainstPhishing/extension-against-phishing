@@ -1,6 +1,5 @@
 ### TO DO:
 
-- 
 - checking against blacklist:
   - background.js - webRequestBlocking - firefox
 
