@@ -33,7 +33,7 @@ var whitelistTwitterGlobal = [];
 var whitelistDomainsGlobal = [];
 
 function blockWebsite(type = 'other') {
-  window.location.href = `https://phishing-blocked.surge.sh/?from=${window.location.href}&type=${type}`;
+  window.location.href = `https://phishing-blocked.surge.sh/?from=${encodeURIComponent(window.location.href)}&type=${encodeURIComponent(type)}`;
 }
 
 function isTwitterPage() {

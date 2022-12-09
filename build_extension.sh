@@ -13,19 +13,19 @@ touch extension-building.lock
 cd src
 
 # build Firefox
-[ -e ../extension-against-phishing-build-firefox.xpi ] && rm ../extension-against-phishing-build-firefox.xpi
-zip -r ../extension-against-phishing-build-firefox.xpi ./* -x manifests/\* manifest.json
+[ -e ../build/extension-against-phishing-build-firefox.xpi ] && rm ../build/extension-against-phishing-build-firefox.xpi
+zip -r ../build/extension-against-phishing-build-firefox.xpi ./* -x manifests/\* manifest.json
 cd manifests/firefox
-zip ../../../extension-against-phishing-build-firefox.xpi manifest.json
+zip ../../../build/extension-against-phishing-build-firefox.xpi manifest.json
 cd ../../
 
 echo "Firefox build finished!";
 
 # build Chrome
-[ -e ../extension-against-phishing-build-chrome.zip ] && rm ../extension-against-phishing-build-chrome.zip
-zip -r ../extension-against-phishing-build-chrome.zip ./* -x manifests/\* manifest.json
+[ -e ../build/extension-against-phishing-build-chrome.zip ] && rm ../build/extension-against-phishing-build-chrome.zip
+zip -r ../build/extension-against-phishing-build-chrome.zip ./* -x manifests/\* manifest.json
 cd manifests/chromium
-zip ../../../extension-against-phishing-build-chrome.zip manifest.json
+zip ../../../build/extension-against-phishing-build-chrome.zip manifest.json
 cd ../../
 
 cp manifests/chromium/manifest.json manifest.json
