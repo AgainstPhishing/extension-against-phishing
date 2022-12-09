@@ -5,9 +5,13 @@
     "start:firefox": "cp ./src/manifests/firefox/manifest.json ./src/manifest.json && web-ext run --browser-console --firefox-preview -t firefox-desktop -s ./src/",
     "start:chromium": "cp ./src/manifests/chromium/manifest.json ./src/manifest.json && web-ext run --browser-console --firefox-preview -t firefox-desktop -s ./src/",
     "lint": "cp ./src/manifests/firefox/manifest.json ./src/manifest.json && web-ext lint --source-dir ./src/",
+    "test": "jest",
     "build": "bash build_extension.sh"
   },
   "devDependencies": {
+    "jest": "^29.3.1",
+    "jest-puppeteer": "^6.1.1",
+    "puppeteer": "^19.2.2",
     "web-ext": "^7.4.0"
   }
 }
