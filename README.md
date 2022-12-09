@@ -8,3 +8,9 @@ This extension is checking visited pages and social media profiles against white
 
 PSL link: https://raw.githubusercontent.com/wrangr/psl/master/dist/psl.min.js
 
+#### Notes
+
+Manifest version 3:
+"New favicon API: this new JavaScript API replaces "chrome://favicons" and gives developers a way to retrieve websites' favicons."
+
+source: https://developer.chrome.com/docs/extensions/mv3/intro/mv3-overview/
