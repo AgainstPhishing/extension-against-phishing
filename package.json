@@ -1,6 +1,6 @@
 {
   "name": "extension-egainst-phishing",
-  "version": "0.2",
+  "version": "0.3",
   "scripts": {
     "start:firefox": "cp ./src/manifests/firefox/manifest.json ./src/manifest.json && web-ext run --browser-console --firefox-preview -t firefox-desktop -s ./src/",
     "start:chromium": "cp ./src/manifests/chromium/manifest.json ./src/manifest.json && web-ext run --browser-console --firefox-preview -t firefox-desktop -s ./src/",

@@ -40,9 +40,11 @@ function isTwitterPage() {
   return window.location.hostname.startsWith('twitter.com');
 }
 
+// TODO: Get one favicon. The bigger one.
 function getCurrentFaviconURL() {
     var favicon = 'favicon.ico'; // default favicon url
     var nodeList = document.getElementsByTagName("link");
+
     for (var i = 0; i < nodeList.length; i++)
     {
         if((nodeList[i].getAttribute("rel") == "icon")||(nodeList[i].getAttribute("rel") == "shortcut icon"))
@@ -51,15 +53,79 @@ function getCurrentFaviconURL() {
             break;
         }
     }
+
+    if(favicon.startsWith("https://") || favicon.startsWith("http://")) {
+      return favicon;        
+    }
+
     return window.location.origin + "/" + favicon;        
 }
 
-const findWhitelistedProjectByTwitterName = (twitterPageName) => whitelistTwitterGlobal.find(
-  item => (
-    twitterPageName.toLowerCase().indexOf(item.name.toLowerCase()) !== -1 ||
-    twitterPageName.toLowerCase().indexOf(item.projectName.toLowerCase()) !== -1
-  )
-);
+/**
+ * @description The following function is trying to search for resembling 
+ *   whitelisted Twitter project to this described in TwitterObject
+ * 
+ * @param {*} TwitterObject 
+ * @returns boolean
+ */
+function doesTwitterObjectResembleWhitelistedProject({name, handle}) {
+  const nameLowercase = name.toLowerCase();
+  const nameReduced = nameLowercase
+  
+    // Replace emoji with space
+    .replace(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g, ' ')
+
+    // TODO: replace Unicode character with ascii counterparts
+
+    // TODO: reduce space-like characters to ascii spaces
+
+    // normalize to Unicode group of characters
+    .normalize("NFD")
+    
+    // remove non-ascii characters
+    .replace(/[^\x00-\x7F]/g, "");
+
+  return whitelistTwitterGlobal.some(
+    whitelistItem => {
+
+      // 1. Try to match exactly the Twitter name.
+      if(whitelistItem.name.toLowerCase() === nameLowercase) {
+        return true;
+      }
+      
+      const whitelistedProjectNameLowercase = whitelistItem.projectName.toLowerCase();
+
+      // 2. Does Twitter Name contains Project Name
+      if(nameLowercase.includes(whitelistedProjectNameLowercase)) {
+        // Without Escaping Regex: /^(\s)?[\s,\.\-_]+/giums;
+        const regexModifiers = 'giums';
+
+        // 2.1 Match beginning
+        const regexBeginningMatch = new RegExp('^(\\s)?'+whitelistedProjectNameLowercase+'[\\s,\\.\\-_]+', regexModifiers);
+
+        // 2.2 Match beginning
+        const regexEndingMatch = new RegExp('[\\s,\\.\\-_]+'+whitelistedProjectNameLowercase+'[\\s\\._-]*$', regexModifiers);
+
+        // 2.3 Match content
+        const regexContentMatch = new RegExp('[\\s,\\.\\-_]+'+whitelistedProjectNameLowercase+'[\\s,\\.\\-_]+', regexModifiers);
+
+        if(
+          nameReduced.match(regexBeginningMatch) ||
+          nameReduced.match(regexEndingMatch) ||
+          nameReduced.match(regexContentMatch)
+        ) {
+          console.log("AP: twitter name contains project name");
+          return true;
+        }
+      }
+
+      // TODO: checking for handle
+      // TODO: fetching description, date and checking against it
+
+      return false;
+    }
+  );
+}
 
 const findWhitelistedProjectByPageTitle = () => (
   whitelistDomainsGlobal.find(
@@ -149,9 +215,7 @@ const isTwitterAccountPhishing = () => {
     return false;
   }
 
-  const project = findWhitelistedProjectByTwitterName(twitterObject.name);
-
-  if(!!project) {
+  if(doesTwitterObjectResembleWhitelistedProject(twitterObject)) {
     console.log("AP: Twitter fake account detected!")
     return true;
   }
@@ -159,9 +223,9 @@ const isTwitterAccountPhishing = () => {
   return false;
 }
 
-const isTwitterAccountWhitelisted = (twitterAccount) => {
-  return !!whitelistTwitterGlobal.find(item => item.handle === twitterAccount);
-}
+const isTwitterAccountWhitelisted = (twitterAccount) => (
+  !!whitelistTwitterGlobal.find(item => item.handle === twitterAccount)
+);
 
 const isItDomainOrSubdomainOfWhitelistedProject = ({address}) => {
   const domain = psl.parse(window.location.hostname).domain;
@@ -188,7 +252,7 @@ async function getResponseHeaderContentLength(response) {
   return size;
 }
 
-const domainAnalyzer = () => {
+async function domainAnalyzer() {
   console.info("AP: Domain analyzer started!");
   // Step 0: Find whitelisted related project
   const project = findWhitelistedProjectByPageTitle();
@@ -204,33 +268,39 @@ const domainAnalyzer = () => {
     return;
   }
 
-  console.log("AP: whitelist faviconUrl", project.faviconUrl);
+  const {faviconUrl: whitelistedFavicon} = project;
+  const currentPageFaviconURL = getCurrentFaviconURL();
 
-  // Analyze favicon size. If the same bytes it's a probably scam.
-  // TODO: Get one favicon. The bigger one.
-  fetch(project.faviconUrl).then(getResponseHeaderContentLength).then(projectFaviconSize => {
-    const currentFaviconURL = getCurrentFaviconURL();
-    console.info("AP: currentFaviconURL", currentFaviconURL);
-  
-    fetch(currentFaviconURL).then(getResponseHeaderContentLength).then(currentFaviconSize => {
-      if(projectFaviconSize === currentFaviconSize) {
-        console.info("AP: Favicons have the same size!");
-        blockWebsite('whitelist_favicon_size');
-        return;
+  console.log("AP: whitelistedFavicon", whitelistedFavicon);
+
+  // Comparing URLs
+  if(currentPageFaviconURL === whitelistedFavicon) {
+    blockWebsite('whitelist_favicon_same_url');
+    return;
+  }
+
+  const [whitelistedFaviconSize, currentFaviconSize] = await Promise.all([
+    fetch(whitelistedFavicon).then(getResponseHeaderContentLength),
+    fetch(currentPageFaviconURL).then(getResponseHeaderContentLength)
+  ]);
+
+  // Compare Favicon Sizes
+  if(whitelistedFaviconSize === currentFaviconSize) {
+    console.info("AP: Favicons have the same size!");
+    blockWebsite('whitelist_favicon_size');
+    return;
+  }
+
+  // Resemble.js based favicon comparison
+  resemble(whitelistedFavicon)
+    .compareTo(currentPageFaviconURL)
+    .scaleToSameSize()
+    .onComplete(data => {
+      console.info("AP: resemble, onComplete", data);
+      if(data.rawMisMatchPercentage < IMAGE_SIMILARITY_THRESHOLD) {
+        blockWebsite('whitelist_favicon_similar_'+IMAGE_SIMILARITY_THRESHOLD);
       }
-
-      // Resemble.js comparison
-      resemble(project.faviconUrl)
-        .compareTo(currentFaviconURL)
-        .scaleToSameSize()
-        .onComplete(data => {
-          console.info("AP: resemble, onComplete", data);
-          if(data.rawMisMatchPercentage < IMAGE_SIMILARITY_THRESHOLD) {
-            blockWebsite('whitelist_favicon_similar_'+IMAGE_SIMILARITY_THRESHOLD);
-          }
-        });
-    })
-  });
+    });
 }
 
 function runOnObservedMutation(callbackFunction) {
@@ -239,29 +309,33 @@ function runOnObservedMutation(callbackFunction) {
   console.info("AP: runOnObservedMutation");
 
   function onMutation(mutations) {
-    mutations.forEach(function(mutation) {
-        if (previousLocationHref != document.location.href) {
-            console.info("AP: Previous URL "+previousLocationHref+" differs from the current: "+document.location.href+"!");
-            previousLocationHref = document.location.href;
-            setTimeout(callbackFunction, 800);
-            return;
-        }
+    mutations.some(function(_mutation) {
+      if (previousLocationHref === document.location.href) {
+        return false;
+      }
+
+      console.info("AP: Previous URL "+previousLocationHref+" differs from the current: "+document.location.href+"!");
+      previousLocationHref = document.location.href;
+      setTimeout(callbackFunction, 800);
+
+      return true;
     });
   }
+
   const mo = new MutationObserver(onMutation);
   
 
   // TODO: revise those settings
   const config = {
-      childList: true,
-      subtree: true
+    childList: true,
+    subtree: true
   };
   
   mo.observe(bodyList, config);
 }
 
 function initCheckingAgainstWhitelist() {
-  setTimeout(() => {
+  setTimeout(async () => {
     if(isTwitterPage()) {
       chrome.storage.local.get('whitelistTwitter', ({whitelistTwitter}) => {
         whitelistTwitterGlobal = whitelistTwitter;
