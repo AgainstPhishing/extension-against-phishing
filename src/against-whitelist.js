@@ -87,13 +87,15 @@ function doesTwitterObjectResembleWhitelistedProject({name, handle}) {
 
   return whitelistTwitterGlobal.some(
     whitelistItem => {
+      const whitelistedProjectNameLowercase = whitelistItem.projectName.toLowerCase();
 
       // 1. Try to match exactly the Twitter name.
-      if(whitelistItem.name.toLowerCase() === nameLowercase) {
+      if(
+        whitelistItem.name.toLowerCase() === nameLowercase ||
+        whitelistedProjectNameLowercase === nameLowercase
+      ) {
         return true;
       }
-      
-      const whitelistedProjectNameLowercase = whitelistItem.projectName.toLowerCase();
 
       // 2. Does Twitter Name contains Project Name
       if(nameLowercase.includes(whitelistedProjectNameLowercase)) {
