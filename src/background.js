@@ -63,7 +63,7 @@ const onBlacklistDomainsUpdate = () => {
         checkAgainstBlacklistListener,
         {urls: ["<all_urls>"]},
         ["blocking", "main_frame"]
-      )
+      );
     });
   } else {
     console.error("AP: There is no chrome.webRequest OR chrome.webRequest.onBeforeRequest!");
@@ -91,6 +91,10 @@ function fetchDataAndUpdateStorage(url, storageKey, callbackFunc = () => {}) {
     });
 }
 
+function isTwitterPage(hostname) {
+  return hostname.startsWith('twitter.com');
+}
+
 function updateStorageWithBlacklistDomains() {
   fetchDataAndUpdateStorage(BLACKLIST_DOMAINS_URL, 'blacklistDomains', onBlacklistDomainsUpdate);
 }
@@ -103,7 +107,13 @@ function updateStorageWithWhitelistTwitter() {
   fetchDataAndUpdateStorage(WHITELIST_TWITTER_URL, 'whitelistTwitter');
 }
 
+function initializeStorageWithUserManagedExeptions() {
+  chrome.storage.local.set({whitelistDomainsUserManaged: []});
+  chrome.storage.local.set({whitelistProfilesTwitterUserManaged: []});
+}
+
 function onInstallListener() {
+  initializeStorageWithUserManagedExeptions();
   updateStorageWithBlacklistDomains();
   updateStorageWithWhitelistDomains();
   updateStorageWithWhitelistTwitter();
@@ -127,8 +137,66 @@ chrome.alarms.onAlarm.addListener(({name}) => {
   }
 });
 
-// ------- webRequest-------
+/**
+ * This listener adds exceptions to local storages:
+ * - whitelistDomainsUserManaged,
+ * - whitelistProfilesTwitterUserManaged
+ */
+chrome.webRequest.onBeforeRequest.addListener((details) => {
+    const url = new URL(details.url);
+    const ok = url.searchParams.get('ok');
 
+    if(!ok) {
+      return;
+    }
+
+    const from = url.searchParams.get('from');
+    const {hostname} = (new URL(from));
+    if(isTwitterPage(hostname)) {
+      const twitter = url.searchParams.get('twitter');
+      if(!twitter) {
+        return;
+      }
+
+      try {
+        const jsonTwitterObject = JSON.parse(twitter);
+
+        // Check whether it's a twitter object
+        if(!jsonTwitterObject.handle) {
+          return;
+        }
+
+        chrome.storage.local.get(['whitelistProfilesTwitterUserManaged']).then(({whitelistProfilesTwitterUserManaged}) => {
+          if(whitelistProfilesTwitterUserManaged.every(twitterObject => twitterObject.handle !== jsonTwitterObject.handle)) {
+            whitelistProfilesTwitterUserManaged.push(jsonTwitterObject);
+            chrome.storage.local.set({whitelistProfilesTwitterUserManaged});  
+            console.info("AP: the following twitterObject has been added to whitelistProfilesTwitterUserManaged", jsonTwitterObject);
+          }
+        });
+      } catch(error) {
+        console.info("AP: JSON parsing error", error);
+      }
+    } else {
+      // here we know, that it's not about twitter but website
+      chrome.storage.local.get(['whitelistDomainsUserManaged']).then(({whitelistDomainsUserManaged}) => {
+        if(whitelistDomainsUserManaged.includes(hostname)) {
+          console.info("AP: the domain already exist at storage.local whitelistDomainsUserManaged", hostname, from);  
+        } else {
+          whitelistDomainsUserManaged.push(hostname);
+          chrome.storage.local.set({whitelistDomainsUserManaged});
+          console.info("AP: the following url has been added to whitelistDomainsUserManaged", hostname, from);  
+        }
+      });
+    }
+  },
+  {
+    urls: ["https://phishing-blocked.surge.sh/*"]
+  }
+);
+
+// ------- webRequest-------
+// ~~~ experimental ~~~
+// TODO: validate behaviour
 // Below code is related to webRequest related blocking
 //    which is not available at manifest v3 on Chrome AND
 //    is risky because it's hard to get blacklistDomains inside of blocking callback
@@ -149,7 +217,7 @@ function generateCheckAgainstBlacklist(blacklistDomains) {
     console.info("AP: _doesHostnameBlacklisted(blacklistDomains, hostname)", _doesHostnameBlacklisted(blacklistDomains, hostname), hostname, blacklistDomains);
     if(_doesHostnameBlacklisted(blacklistDomains, hostname)) {
       return {
-        redirectUrl: `https://phishing-blocked.surge.sh/?from=${url}&type=blacklist_webRequestBlocking`
+        redirectUrl: `https://phishing-blocked.surge.sh/?from=${encodeURIComponent(url)}&type=blacklist_web_request_blocking`
       };
     }
 

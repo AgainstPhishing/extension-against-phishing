@@ -166,7 +166,7 @@
                       If you think that it's a mistake plase contact us at 
                       <!-- source: http://rot13.florianbersier.com -->
                       <!--Place the code below where you want the link to be displayed-->
-                      <span id="obf"><script>document.getElementById("obf").innerHTML="<n uers=\"znvygb:sverjnyyntnvafgcuvfuvat@tznvy.pbz?fhowrpg=[snyfr-cbfvgvir] Vg'f abg n cuvfuvat\" gnetrg=\"_oynax\">sverjnyyntnvafgcuvfuvat@tznvy.pbz</n>".replace(/[a-zA-Z]/g,function(c){return String.fromCharCode((c<="Z"?90:122)>=(c=c.charCodeAt(0)+13)?c:c-26);});document.body.appendChild(eo);</script>
+                      <span id="obf"><script>document.getElementById("obf").innerHTML="<n uers=\"znvygb:sverjnyyntnvafgcuvfuvat@tznvy.pbz?fhowrpg=[snyfr-cbfvgvir] Vg'f abg n cuvfuvat\" gnetrg=\"_oynax\">sverjnyyntnvafgcuvfuvat@tznvy.pbz</n>".replace(/[a-zA-Z]/g,function(c){return String.fromCharCode((c<="Z"?90:122)>=(c=c.charCodeAt(0)+13)?c:c-26);});</script>
                         <noscript><span style="unicode-bidi:bidi-override;direction:rtl;">moc.liamg@gnihsihptsniagallawerif</span></noscript></span>
                         .
                     </p>
@@ -199,8 +199,10 @@
     function onClickProceed(e) {
       e = e || window.event;
       e.preventDefault();
+      const url = new URL(window.location.href);
+      url.searchParams.set('ok', true);
 
-      window.location.href = from;
+      window.location.href = url.href;
     }
 
     window.addEventListener('load', () => {

@@ -1,3 +1,9 @@
+## Release 0.4
+- [bug fixed] encoding GET parameter from everywhere not only at against-whitelist.js file
+- Added user managed whitelists for domains and twitter profiles
+  - As an result the user may preceed to the website despite the blocking
+- Preformance improvement - separate scripts has been added only for twitter and phishing-blocked website
+
 ## Release 0.3
 - improved checking twitter profiles against whitelist
 - adding add-on logotypes visible at extension list
