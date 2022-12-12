@@ -6,8 +6,10 @@ Extension Against Phishing is checking visited pages and twitter profiles agains
 
 ## Downloads links
 
-- [Firefox ADD-ONS](https://addons.mozilla.org/pl/firefox/addon/extension-against-phishing/)
-- [Chrome/Brave Web Store](https://chrome.google.com/webstore/detail/extension-against-phishin/dpnagbgbgibnlnpahopcpaenmmcnlndn)
+- [Official Firefox ADD-ONS](https://addons.mozilla.org/pl/firefox/addon/extension-against-phishing/)
+- [Official Chrome/Brave Web Store](https://chrome.google.com/webstore/detail/extension-against-phishin/dpnagbgbgibnlnpahopcpaenmmcnlndn)
+
+You can also download it from github directly.
 
 ## External libraries:
 We are using:
