@@ -1,6 +1,16 @@
 const BLOCKED_PAGE_URL = "https://phishing-blocked.surge.sh";
 
+function delay(time) {
+  return new Promise(function(resolve) { 
+      setTimeout(resolve, time)
+  });
+}
+
 describe("blacklist", () => {
+  beforeAll(async () => {
+    await delay(2000); // wait for download of blacklist and whitelist
+  });
+
   describe('visited primotapia.surge.sh', () => {
     let url;
   
