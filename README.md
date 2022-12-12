@@ -1,16 +1,25 @@
-## Browser Extension AgainstPhishing
+# Browser Extension Against Phishing
 
-This extension is checking visited pages and social media profiles against whitelisted and blacklisted websites, social media profiles, IP addresses and crypto wallet addresses. Also it usees a few tricks to detect whether the visited page is crypto related or is not.
+![The San Juan Mountains are beautiful!](/assets/logo/logo-128x128.png)
+
+Extension Against Phishing is checking visited pages and twitter profiles against whitelisted and blacklisted websites, social media profiles, IP addresses and crypto wallet addresses. It is dedicated to crypto industry.
+
+## Downloads links
+
+- [Firefox ADD-ONS](https://addons.mozilla.org/pl/firefox/addon/extension-against-phishing/)
+- [Chrome/Brave Web Store](https://chrome.google.com/webstore/detail/extension-against-phishin/dpnagbgbgibnlnpahopcpaenmmcnlndn)
+
+## External libraries:
+We are using:
+- [PSL library](https://github.com/lupomontero/psl) for domain parsing ([build link](https://raw.githubusercontent.com/wrangr/psl/master/dist/psl.min.js))
+- resemble.js library for image comparison
+
+### Notes
+
+Regarding Manifest version 3 and favicons:
+["New favicon API: this new JavaScript API replaces "chrome://favicons" and gives developers a way to retrieve websites' favicons."](https://developer.chrome.com/docs/extensions/mv3/intro/mv3-overview/)
 
 
+## Links
 
-#### References:
-
-PSL link: https://raw.githubusercontent.com/wrangr/psl/master/dist/psl.min.js
-
-#### Notes
-
-Manifest version 3:
-"New favicon API: this new JavaScript API replaces "chrome://favicons" and gives developers a way to retrieve websites' favicons."
-
-source: https://developer.chrome.com/docs/extensions/mv3/intro/mv3-overview/
+Follow use on [Twitter](https://twitter.com/phishing_report)
