@@ -6,7 +6,7 @@ function initializeRedirectToExceptionPage() {
     const ok = url.searchParams.get('ok');
     const from = url.searchParams.get('from');
     const twitter = url.searchParams.get('twitter');
-
+    
     if(ok && from) {
       if(twitter) {
         const twitterJson = JSON.parse(twitter);

@@ -29,6 +29,11 @@ function blockWebsite(type, twitterObject) {
   window.location.href = `https://phishing-blocked.surge.sh/?from=${encodeURIComponent(window.location.href)}&type=${encodeURIComponent(type)}&twitter=${encodeURIComponent(JSON.stringify(twitterObject))}`;
 }
 
+function displayNotificationAboutUnsafeTwitterSubpage(twitterObject) {
+  console.info("AP: displayNotificationAboutUnsafeTwitterSubpage", twitterObject);
+  chrome.runtime.sendMessage({name: 'unsafe-phishing-related-twitter-subpage', twitterObject});
+}
+
 const analyzeTwitter = () => {
   console.info("AP: Twitter analyze started!");
 
@@ -47,7 +52,8 @@ const analyzeTwitter = () => {
   if(whitelistProfilesTwitterUserManagedGlobal.some(
     whitelistedTwitterObject => whitelistedTwitterObject.handle === twitterObject.handle )
   ) {
-      return
+      displayNotificationAboutUnsafeTwitterSubpage(twitterObject);
+      return;
   }
 
   if(isTwitterAccountWhitelisted(twitterObject.handle)) {

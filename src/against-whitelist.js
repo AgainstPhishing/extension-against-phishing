@@ -14,6 +14,10 @@ function blockWebsite(type = 'other') {
   window.location.href = `https://phishing-blocked.surge.sh/?from=${encodeURIComponent(window.location.href)}&type=${encodeURIComponent(type)}`;
 }
 
+function displayNotificationAboutUnsafeWebsite(hostname) {
+  chrome.runtime.sendMessage({name: 'unsafe-phishing-related-website', hostname});
+}
+
 // TODO: Get one favicon. The bigger one.
 function getCurrentFaviconURL() {
     var favicon = 'favicon.ico'; // default favicon url
@@ -126,7 +130,9 @@ function initCheckingAgainstWhitelist() {
       // TODO: Make it DRY - this is repeated at against-blacklist.js
       if(whitelistDomainsUserManaged.includes(window.location.hostname)) {
         console.warn("AP: The website whitelisted by user", window.location.hostname);
-        // TODO: Display warning to the user!
+
+        displayNotificationAboutUnsafeWebsite(window.location.hostname);
+
         return;
       }
 

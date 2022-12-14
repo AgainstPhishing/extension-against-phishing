@@ -8,7 +8,8 @@
     "storage", "unlimitedStorage",
     "webRequest", "webRequestBlocking",
     "activeTab", "tabs",
-    "alarms", "<all_urls>"
+    "alarms", "<all_urls>",
+    "notifications"
   ],
   "content_scripts": [
     {
@@ -30,7 +31,7 @@
       ]
     },
     {
-      "run_at": "document_idle",
+      "run_at": "document_start",
       "matches": ["https://phishing-blocked.surge.sh/*"],
       "js": [
         "redirect-to-user-managed-exception.js"

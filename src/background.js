@@ -44,31 +44,90 @@ const BLACKLIST_DOMAINS_URL = getDataResourceURL(DATA_URL, BLACKLIST_DOMAINS_GIT
 const WHITELIST_DOMAINS_URL = getDataResourceURL(DATA_URL, WHITELIST_DOMAINS_GITHUB_LOCATION);
 const WHITELIST_TWITTER_URL = getDataResourceURL(DATA_URL, WHITELIST_TWITTER_GITHUB_LOCATION);
 
-const onBlacklistDomainsUpdate = () => {
-  // is chromium engine - break
-  if(typeof browser === "undefined") {
-    return;
-  }
+// const onBlacklistDomainsUpdate = () => {
+//   // is chromium engine - break
+//   if(typeof browser === "undefined") {
+//     return;
+//   }
 
-  console.info("AP: onBlacklistDomainsUpdate");
+//   console.info("AP: onBlacklistDomainsUpdate");
   
-  // webRequest would work only in Firefox OR
-  //    on Chromium engine with manifest version 2
-  if(browser.webRequest && browser.webRequest.onBeforeRequest) {
-    // TODO: remove existing listener
+//   // webRequest would work only in Firefox OR
+//   //    on Chromium engine with manifest version 2
+//   if(browser.webRequest && browser.webRequest.onBeforeRequest) {
+//     // TODO: remove existing listener
 
-    chrome.storage.local.get('blacklistDomains', ({blacklistDomains}) => {
-      const checkAgainstBlacklistListener = generateCheckAgainstBlacklist(blacklistDomains);
-      browser.webRequest.onBeforeRequest.addListener(
-        checkAgainstBlacklistListener,
-        {urls: ["<all_urls>"]},
-        ["blocking", "main_frame"]
-      );
-    });
-  } else {
-    console.error("AP: There is no chrome.webRequest OR chrome.webRequest.onBeforeRequest!");
+//     chrome.storage.local.get('blacklistDomains', ({blacklistDomains}) => {
+//       const checkAgainstBlacklistListener = generateCheckAgainstBlacklist(blacklistDomains);
+//       browser.webRequest.onBeforeRequest.addListener(
+//         checkAgainstBlacklistListener,
+//         {urls: ["<all_urls>"]},
+//         ["blocking", "main_frame"]
+//       );
+//     });
+//   } else {
+//     console.error("AP: There is no chrome.webRequest OR chrome.webRequest.onBeforeRequest!");
+//   }
+// };
+
+function handleNotificationRequest(request) {
+  console.info('AP: handleNotificationRequest');
+
+  const notificationOptions = {
+    type: "basic",
+    iconUrl: chrome.runtime.getURL("icons/logo-96x96.png"),
+    buttons: [{
+      title: "Block it again!"
+    }]
+  };
+
+  if(request.name === 'unsafe-phishing-related-twitter-subpage') {
+    function removeUnsafeTwitterPageFromWhitelist(name) {
+      if(request.name !== name) {
+        console.log("AP: request", request);
+        return;
+      }
+
+      chrome.storage.local.get(['whitelistProfilesTwitterUserManaged'], ({whitelistProfilesTwitterUserManaged}) => {
+        chrome.storage.local.set({
+          whitelistProfilesTwitterUserManaged: whitelistProfilesTwitterUserManaged.filter(twitterObject => request.twitterObject.handle !== twitterObject.handle)
+        }, () => {
+          chrome.runtime.onMessage.removeListener(removeUnsafeTwitterPageFromWhitelist);
+        });
+        console.info("AP: the following twitterObject has been removef from whitelistProfilesTwitterUserManaged", request.twitterObject);
+      });
+  
+    }
+
+    notificationOptions.title = "UNSAFE Twitter page!";
+    notificationOptions.message = "The twitter page you are visiting is unsafe but you chose to visit it despite the risk.";
+    chrome.notifications.onButtonClicked.addListener(removeUnsafeTwitterPageFromWhitelist);
+    
+  } else if(request.name === 'unsafe-phishing-related-website') {
+    function removeUnsafeWebsiteFromWhitelist(name) {
+      if(request.name !== name) {
+        console.log("AP: request", request);
+        return;
+      }
+      chrome.storage.local.get(['whitelistDomainsUserManaged'], ({whitelistDomainsUserManaged}) => {
+        chrome.storage.local.set({
+          whitelistDomainsUserManaged: whitelistDomainsUserManaged.filter(hostname => hostname !== request.hostname)
+        }, () => {
+          chrome.runtime.onMessage.removeListener(removeUnsafeWebsiteFromWhitelist);
+        });
+        console.info("AP: the following hostname has been removed from whitelistDomainsUserManaged", request.hostname);  
+      });
+    }
+
+    notificationOptions.title = "UNSAFE website!";
+    notificationOptions.message = "The website you are visiting is unsafe but you chose to visit it despite the risk.";
+    chrome.notifications.onButtonClicked.addListener(removeUnsafeWebsiteFromWhitelist);
   }
-};
+
+  chrome.notifications.create(request.name, notificationOptions);
+}
+
+chrome.runtime.onMessage.addListener(handleNotificationRequest);
 
 function getDataResourceURL(url_template, location) {
   return url_template
@@ -96,7 +155,7 @@ function isTwitterPage(hostname) {
 }
 
 function updateStorageWithBlacklistDomains() {
-  fetchDataAndUpdateStorage(BLACKLIST_DOMAINS_URL, 'blacklistDomains', onBlacklistDomainsUpdate);
+  fetchDataAndUpdateStorage(BLACKLIST_DOMAINS_URL, 'blacklistDomains'); //, onBlacklistDomainsUpdate);
 }
 
 function updateStorageWithWhitelistDomains() {
@@ -166,7 +225,7 @@ chrome.webRequest.onBeforeRequest.addListener((details) => {
           return;
         }
 
-        chrome.storage.local.get(['whitelistProfilesTwitterUserManaged']).then(({whitelistProfilesTwitterUserManaged}) => {
+        chrome.storage.local.get(['whitelistProfilesTwitterUserManaged'], ({whitelistProfilesTwitterUserManaged}) => {
           if(whitelistProfilesTwitterUserManaged.every(twitterObject => twitterObject.handle !== jsonTwitterObject.handle)) {
             whitelistProfilesTwitterUserManaged.push(jsonTwitterObject);
             chrome.storage.local.set({whitelistProfilesTwitterUserManaged});  
@@ -178,7 +237,7 @@ chrome.webRequest.onBeforeRequest.addListener((details) => {
       }
     } else {
       // here we know, that it's not about twitter but website
-      chrome.storage.local.get(['whitelistDomainsUserManaged']).then(({whitelistDomainsUserManaged}) => {
+      chrome.storage.local.get(['whitelistDomainsUserManaged'], ({whitelistDomainsUserManaged}) => {
         if(whitelistDomainsUserManaged.includes(hostname)) {
           console.info("AP: the domain already exist at storage.local whitelistDomainsUserManaged", hostname, from);  
         } else {
@@ -188,8 +247,7 @@ chrome.webRequest.onBeforeRequest.addListener((details) => {
         }
       });
     }
-  },
-  {
+  }, {
     urls: ["https://phishing-blocked.surge.sh/*"]
   }
 );
@@ -201,28 +259,28 @@ chrome.webRequest.onBeforeRequest.addListener((details) => {
 //    which is not available at manifest v3 on Chrome AND
 //    is risky because it's hard to get blacklistDomains inside of blocking callback
 
-function _doesHostnameBlacklisted(blacklistDomains, hostname) {
-  extractDomain
-  for(let i = 0; i < blacklistDomains.length; i++) {
-    if( blacklistDomains[i] === hostname) {
-      return true;
-    }
-  }
-  return false;
-}
+// function _doesHostnameBlacklisted(blacklistDomains, hostname) {
+//   extractDomain
+//   for(let i = 0; i < blacklistDomains.length; i++) {
+//     if( blacklistDomains[i] === hostname) {
+//       return true;
+//     }
+//   }
+//   return false;
+// }
 
-function generateCheckAgainstBlacklist(blacklistDomains) {
-  return function _checkAgainstBlacklistListener({url}) {
-    const {hostname} = new URL(url);
-    console.info("AP: _doesHostnameBlacklisted(blacklistDomains, hostname)", _doesHostnameBlacklisted(blacklistDomains, hostname), hostname, blacklistDomains);
-    if(_doesHostnameBlacklisted(blacklistDomains, hostname)) {
-      return {
-        redirectUrl: `https://phishing-blocked.surge.sh/?from=${encodeURIComponent(url)}&type=blacklist_web_request_blocking`
-      };
-    }
+// function generateCheckAgainstBlacklist(blacklistDomains) {
+//   return function _checkAgainstBlacklistListener({url}) {
+//     const {hostname} = new URL(url);
+//     console.info("AP: _doesHostnameBlacklisted(blacklistDomains, hostname)", _doesHostnameBlacklisted(blacklistDomains, hostname), hostname, blacklistDomains);
+//     if(_doesHostnameBlacklisted(blacklistDomains, hostname)) {
+//       return {
+//         redirectUrl: `https://phishing-blocked.surge.sh/?from=${encodeURIComponent(url)}&type=blacklist_web_request_blocking`
+//       };
+//     }
 
-    return {};
-  };
-}
+//     return {};
+//   };
+// }
 
-chrome.storage.onChanged.addListener(onBlacklistDomainsUpdate);
+// chrome.storage.onChanged.addListener(onBlacklistDomainsUpdate);

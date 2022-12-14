@@ -106,8 +106,6 @@ describe("whitelist", () => {
     let url;
 
     beforeAll(async () => {
-      // const context = await browser.createIncognitoBrowserContext();
-      // pageIncognito = await context.newPage();
 
       // Navigate to extension page
       await page.goto('https://twitter.com', {

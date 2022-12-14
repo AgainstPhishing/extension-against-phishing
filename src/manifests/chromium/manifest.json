@@ -4,7 +4,13 @@
   "description": "Against Phishing browser extension prevents you against phishing based on blacklisted and whitelisted crypto related resources.",
   "version": "0.4",
   "homepage_url": "https://github.com/AgainstPhishing/extension-against-phishing",
-  "permissions": ["storage", "unlimitedStorage", "alarms", "webRequest"],
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "alarms",
+    "webRequest",
+    "notifications"
+  ],
   "host_permissions": [
     "<all_urls>"
   ],
