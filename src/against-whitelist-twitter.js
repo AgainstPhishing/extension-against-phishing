@@ -66,7 +66,7 @@ const analyzeTwitter = () => {
     return;
   }
 
-  console.log("AP: Twitter fake account detected!")
+  console.info("AP: Twitter fake account detected!")
 
   blockWebsite('whitelist_twitter', twitterObject);
 };
@@ -106,7 +106,7 @@ function getTwitterHandleAndPageName() {
   
   handle = isTwitterStatusPage();
 
-  console.log("AP: isTwitterStatusPage", handle);
+  console.info("AP: isTwitterStatusPage", handle);
 
   if(handle) {
     return {
@@ -158,20 +158,29 @@ function runOnObservedHeadMutation(callbackFunction) {
 
 async function analizeTwitterFeedCellInnerDivNode(node) {
   const userNameElement = node.querySelector('[data-testid="User-Names"]');
+  if(!userNameElement) {
+    console.info("AP: userNameElement is empty");
+    return;
+  }
   const userProfileLinkElement = userNameElement.querySelector('a[role="link"]');
+  if(!userProfileLinkElement) {
+    console.info("AP: userProfileLinkElement is empty");
+    return;
+  }
+
   const twitterObject = {
     handle: userProfileLinkElement.getAttribute('href').substring(1),
     name: userProfileLinkElement.textContent
   };
 
-  console.log("AP: node", node, twitterObject, userNameElement, userProfileLinkElement);
+  console.info("AP: analizeTwitterFeedCellInnerDivNode, node", node, twitterObject, userNameElement, userProfileLinkElement);
 
   if(
     // TODO: add whitelabel if the page is whitelisted
     !isTwitterAccountWhitelisted(twitterObject) &&
     doesTwitterObjectResembleWhitelistedProject(twitterObject)
   ) {
-    console.warn("AP: node is fake twitter page", node, twitterObject)
+    console.info("AP: node is fake twitter page", node, twitterObject)
     node.classList.add('ap-fake-profile');
     node.setAttribute('data-testtest', 'dupa');
   }
@@ -184,10 +193,8 @@ function runOnObservedBody() {
 
   function onMutation(mutations /* MutationRecord[] */) {
     mutations.forEach(mutation => {
-      // setTimeout(callbackFunction, 800);
-      console.log("AP: onMutation", mutation);
       mutation.addedNodes.forEach(addedNode => {
-        console.log("AP: node added", addedNode);
+        console.info("AP: runOnObservedBody, node added", addedNode);
 
         if(addedNode.getAttribute('data-testid') === "cellInnerDiv") {
           analizeTwitterFeedCellInnerDivNode(addedNode);
@@ -264,7 +271,7 @@ function doesTwitterObjectResembleWhitelistedProject({name, handle}) {
           nameReduced.match(regexEndingMatch) ||
           nameReduced.match(regexContentMatch)
         ) {
-          console.log("AP: twitter name contains project name");
+          console.info("AP: twitter name contains project name");
           return true;
         }
       }

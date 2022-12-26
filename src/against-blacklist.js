@@ -21,7 +21,7 @@ const doesUserVisitBlacklistedDomain = (blacklistDomains) => {
 chrome.storage.local.get(['blacklistDomains', 'whitelistDomainsUserManaged'], ({blacklistDomains, whitelistDomainsUserManaged}) => {
   // TODO: Make it DRY - this is repeated at against-blacklist.js
   if(whitelistDomainsUserManaged.includes(window.location.hostname)) {
-    console.warn("AP: The website whitelisted by user", window.location.hostname);
+    console.info("AP: The website whitelisted by user", window.location.hostname);
     // TODO: Display warning to the user!
     return;
   }

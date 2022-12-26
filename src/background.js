@@ -84,7 +84,7 @@ function handleNotificationRequest(request) {
   if(request.name === 'unsafe-phishing-related-twitter-subpage') {
     function removeUnsafeTwitterPageFromWhitelist(name) {
       if(request.name !== name) {
-        console.log("AP: request", request);
+        console.info("AP: request.name !== name, request", request);
         return;
       }
 
@@ -106,7 +106,7 @@ function handleNotificationRequest(request) {
   } else if(request.name === 'unsafe-phishing-related-website') {
     function removeUnsafeWebsiteFromWhitelist(name) {
       if(request.name !== name) {
-        console.log("AP: request", request);
+        console.info("AP: request", request);
         return;
       }
       chrome.storage.local.get(['whitelistDomainsUserManaged'], ({whitelistDomainsUserManaged}) => {

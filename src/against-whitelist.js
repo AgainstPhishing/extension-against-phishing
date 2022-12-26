@@ -90,7 +90,7 @@ async function domainAnalyzer() {
   const {faviconUrl: whitelistedFavicon} = project;
   const currentPageFaviconURL = getCurrentFaviconURL();
 
-  console.log("AP: whitelistedFavicon", whitelistedFavicon);
+  console.info("AP: whitelistedFavicon", whitelistedFavicon);
 
   // Comparing URLs
   if(currentPageFaviconURL === whitelistedFavicon) {
@@ -129,7 +129,7 @@ function initCheckingAgainstWhitelist() {
 
       // TODO: Make it DRY - this is repeated at against-blacklist.js
       if(whitelistDomainsUserManaged.includes(window.location.hostname)) {
-        console.warn("AP: The website whitelisted by user", window.location.hostname);
+        console.info("AP: The website whitelisted by user", window.location.hostname);
 
         displayNotificationAboutUnsafeWebsite(window.location.hostname);
 
