@@ -1,3 +1,6 @@
+## Release 0.5
+- Added twitter fake pages indicator on feeds
+
 ## Release 0.4
 - [bug fixed] encoding GET parameter from everywhere not only at against-whitelist.js file
 - Added user managed whitelists for domains and twitter profiles

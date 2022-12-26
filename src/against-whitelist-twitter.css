@@ -1,0 +1,29 @@
+.ap-fake-profile {
+	background-color: grey;
+}
+
+.ap-fake-profile::after,
+.ap-fake-profile::before {
+  color: white;
+  font-family: sans-serif;
+  display: block;
+  text-align: center;
+  background: url('chrome-extension://__MSG_@@extension_id__/icons/logo-32x32.png') left center no-repeat, url('chrome-extension://__MSG_@@extension_id__/icons/logo-32x32.png') right center no-repeat, #990000;
+  margin: 5px 3px;
+  padding: 3px 2px;
+  border-radius: 15px;
+}
+
+.ap-fake-profile::before {
+  content: "THE FOLLOWING TWITTER PAGE MIGHT BE FAKE";
+}
+
+.ap-fake-profile::after {
+  content: "THE ABOVE TWITTER PAGE MIGHT BE FAKE";
+}
+
+@supports (-moz-appearance:none) {
+  .ap-fake-profile::after, .ap-fake-profile::before {
+    background: url('/icons/logo-32x32.png') left center no-repeat, url('/icons/logo-32x32.png') right center no-repeat, #990000;
+  }
+}

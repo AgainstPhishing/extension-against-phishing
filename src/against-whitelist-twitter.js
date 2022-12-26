@@ -56,7 +56,7 @@ const analyzeTwitter = () => {
       return;
   }
 
-  if(isTwitterAccountWhitelisted(twitterObject.handle)) {
+  if(isTwitterAccountWhitelisted(twitterObject)) {
     console.info("AP: Twitter account whitelisted!");
 
     return;
@@ -128,40 +128,86 @@ function getTwitterHandleAndPageName() {
   return null;
 }
 
-const isTwitterAccountWhitelisted = (twitterAccount) => (
-  !!whitelistTwitterGlobal.find(item => item.handle === twitterAccount)
+const isTwitterAccountWhitelisted = ({handle}) => (
+  !!whitelistTwitterGlobal.find(item => item.handle === handle)
 );
 
-function runOnObservedMutation(callbackFunction) {
-  const bodyList = document.querySelector("body");
+function runOnObservedHeadMutation(callbackFunction) {
+  const documentHead = document.head;
 
-  console.info("AP: runOnObservedMutation");
+  console.info("AP: runOnObservedHeadMutation");
 
   function onMutation(mutations) {
-    mutations.some(function(_mutation) {
-      if (previousLocationHref === document.location.href) {
-        return false;
-      }
+    if (previousLocationHref === document.location.href) {
+      return false;
+    }
 
-      console.info("AP: Previous URL "+previousLocationHref+" differs from the current: "+document.location.href+"!");
-      previousLocationHref = document.location.href;
-      setTimeout(callbackFunction, 800);
+    console.info("AP: Previous URL "+previousLocationHref+" differs from the current: "+document.location.href+"!");
+    previousLocationHref = document.location.href;
+    setTimeout(callbackFunction, 800);
 
-      return true;
-    });
+    return true;
   }
 
   const mo = new MutationObserver(onMutation);
   
+  mo.observe(documentHead, {
+    childList: true
+  });
+}
 
-  // TODO: revise those settings
-  const config = {
+async function analizeTwitterFeedCellInnerDivNode(node) {
+  const userNameElement = node.querySelector('[data-testid="User-Names"]');
+  const userProfileLinkElement = userNameElement.querySelector('a[role="link"]');
+  const twitterObject = {
+    handle: userProfileLinkElement.getAttribute('href').substring(1),
+    name: userProfileLinkElement.textContent
+  };
+
+  console.log("AP: node", node, twitterObject, userNameElement, userProfileLinkElement);
+
+  if(
+    // TODO: add whitelabel if the page is whitelisted
+    !isTwitterAccountWhitelisted(twitterObject) &&
+    doesTwitterObjectResembleWhitelistedProject(twitterObject)
+  ) {
+    console.warn("AP: node is fake twitter page", node, twitterObject)
+    node.classList.add('ap-fake-profile');
+    node.setAttribute('data-testtest', 'dupa');
+  }
+}
+
+function runOnObservedBody() {
+  const bodyList = document.querySelector("body");
+  
+  console.info("AP: runOnObservedBody");
+
+  function onMutation(mutations /* MutationRecord[] */) {
+    mutations.forEach(mutation => {
+      // setTimeout(callbackFunction, 800);
+      console.log("AP: onMutation", mutation);
+      mutation.addedNodes.forEach(addedNode => {
+        console.log("AP: node added", addedNode);
+
+        if(addedNode.getAttribute('data-testid') === "cellInnerDiv") {
+          analizeTwitterFeedCellInnerDivNode(addedNode);
+        }
+      });
+    });
+
+    console.info("AP: Previous URL "+previousLocationHref+" differs from the current: "+document.location.href+"!");
+
+    return true;
+  }
+
+  const mo = new MutationObserver(onMutation);
+  
+  mo.observe(bodyList, {
     childList: true,
     subtree: true
-  };
-  
-  mo.observe(bodyList, config);
+  });
 }
+
 
 /**
  * @description The following function is trying to search for resembling 
@@ -232,16 +278,16 @@ function doesTwitterObjectResembleWhitelistedProject({name, handle}) {
 }
 
 function initCheckingAgainstWhitelistTwitter() {
-  // TODO, remove timeout if possible
-  setTimeout(async () => {
-    chrome.storage.local.get(['whitelistTwitter', 'whitelistProfilesTwitterUserManaged'], ({whitelistTwitter, whitelistProfilesTwitterUserManaged}) => {
-      whitelistTwitterGlobal = whitelistTwitter;
-      whitelistProfilesTwitterUserManagedGlobal = whitelistProfilesTwitterUserManaged;
+  chrome.storage.local.get(['whitelistTwitter', 'whitelistProfilesTwitterUserManaged'], ({whitelistTwitter, whitelistProfilesTwitterUserManaged}) => {
+    whitelistTwitterGlobal = whitelistTwitter;
+    whitelistProfilesTwitterUserManagedGlobal = whitelistProfilesTwitterUserManaged;
+    setTimeout(async () => {
+      runOnObservedBody();
 
-      runOnObservedMutation(analyzeTwitter);
+      runOnObservedHeadMutation(analyzeTwitter);
       analyzeTwitter();
-    });
-  }, 1000);  
+    }, 1000);
+  });
 }
 
 initCheckingAgainstWhitelistTwitter();

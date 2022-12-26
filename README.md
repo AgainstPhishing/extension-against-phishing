@@ -1,6 +1,6 @@
 # Browser Extension Against Phishing
 
-![The San Juan Mountains are beautiful!](/assets/logo/logo-128x128.png)
+![Extension Against Phishing - Logo!](/assets/logo/logo-128x128.png)
 
 Extension Against Phishing is checking visited pages and twitter profiles against whitelisted and blacklisted websites, social media profiles, IP addresses and crypto wallet addresses. It is dedicated to crypto industry.
 
