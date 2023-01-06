@@ -78,7 +78,7 @@ const isTwitterStatusPage = () => {
   const regex = /twitter.com\/(.*)\/status\//;
   const matches = document.location.href.match(regex);
   if(matches) {
-    return matches[0];
+    return matches[1];
   }
 
   return false;

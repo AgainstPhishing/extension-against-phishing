@@ -1,5 +1,5 @@
 .ap-fake-profile {
-	background-color: grey;
+	background-color: #808080AA;
 }
 
 .ap-fake-profile::after,
@@ -10,7 +10,7 @@
   text-align: center;
   background: url('chrome-extension://__MSG_@@extension_id__/icons/logo-32x32.png') left center no-repeat, url('chrome-extension://__MSG_@@extension_id__/icons/logo-32x32.png') right center no-repeat, #990000;
   margin: 5px 3px;
-  padding: 3px 2px;
+  padding: 7px 2px;
   border-radius: 15px;
 }
 
