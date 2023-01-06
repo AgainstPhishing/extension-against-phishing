@@ -1,5 +1,6 @@
 ## Release 0.5
 - Added twitter fake pages indicator on feeds
+- [bug fixed] Wrong handle detected - status page blocked as false positive
 
 ## Release 0.4
 - [bug fixed] encoding GET parameter from everywhere not only at against-whitelist.js file
